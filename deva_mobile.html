@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kavya… My Valentine? 💖</title>
+
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #ffd1dc, #ffc9de);
+    color: #b30059;
+}
+
+/* Responsive text */
+h1 {
+    margin-top: 12vh;
+    font-size: 6vw;
+    font-weight: 700;
+    padding: 0 10px;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 4vw;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    margin: 8px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* Yes button pulse */
+#yesBtn {
+    background: white;
+    color: #b30059;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px #ff4da6; }
+    50% { transform: scale(1.08); box-shadow: 0 0 15px #ff4da6; }
+    100% { transform: scale(1); box-shadow: 0 0 5px #ff4da6; }
+}
+
+/* No button */
+#noBtn {
+    background: white;
+    color: #b30059;
+    font-weight: bold;
+}
+
+/* Wiggle effect for No button on hover */
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Final love card */
+#finalCard {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.9);
+    color: #b30059;
+    padding: 40px;
+    border-radius: 30px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 60px rgba(255, 105, 180, 0.6);
+    transition: all 0.6s ease;
+    z-index: 9998;
+}
+
+#finalCard.show {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#finalCard h2 {
+    font-size: 6vw;
+    margin-bottom: 15px;
+}
+
+#finalText {
+    font-size: 4vw;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* Floating hearts */
+.heart {
+    position: absolute;
+    color: #ff4da6;
+    font-size: 4vw;
+    animation: float 5s linear infinite;
+}
+
+@keyframes float {
+    from {transform: translateY(100vh);}
+    to {transform: translateY(-10vh);}
+}
+
+/* Ring animation */
+#ring {
+    font-size: 12vw;
+    margin-bottom: 10px;
+    display: inline-block;
+    animation: popRing 1s ease forwards;
+}
+
+@keyframes popRing {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+/* Cursor sparkles for mobile (touch) */
+.sparkle {
+    position: absolute;
+    width: 4vw;
+    height: 4vw;
+    background: #ff66b2;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.8;
+    animation: sparkleFade 0.8s linear forwards;
+}
+
+@keyframes sparkleFade {
+    to { transform: translateY(-20px) scale(0); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="question">Kavya… will you be my Valentine? 💖</h1>
+<div id="buttonsWrapper">
+    <button id="yesBtn">Yes 😍</button>
+    <button id="noBtn">No 😢</button>
+</div>
+
+<div id="finalCard">
+    <div id="ring">💍</div>
+    <h2>You Said Yes 😭💖</h2>
+    <div id="finalText"></div>
+</div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const question = document.getElementById("question");
+const finalCard = document.getElementById("finalCard");
+const finalText = document.getElementById("finalText");
+
+let finalShown = false;
+let noClicks = 0;
+
+const messages = [
+    "Kavya… are you really sure? 😳",
+    "Think again… I rehearsed this 20 times 😌",
+    "This is a limited edition Deva offer 😏",
+    "Okay, now my heart is shaking a little 💔",
+    "Don’t do this to me 🥲",
+    "The Yes button looks very tempting right now 👀",
+    "You can run but you can’t hide 😈",
+    "I promise you… I’ll make you the happiest ever 🥰"
+];
+
+let floatSpeed = 1200; // base speed for No movement
+
+// --- No button hover wiggle ---
+function wiggleBtn() {
+    noBtn.style.animation = "wiggle 0.5s";
+    setTimeout(()=>{ noBtn.style.animation = ""; }, 500);
+}
+
+// --- No button floating ---
+let noFloatInterval;
+function startFloating() {
+    clearInterval(noFloatInterval);
+    noFloatInterval = setInterval(() => {
+        if(finalShown || noClicks >= messages.length -1) return;
+        const dx = (Math.random() - 0.5) * 20; 
+        const dy = (Math.random() - 0.5) * 20; 
+        noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+    }, floatSpeed);
+}
+startFloating();
+
+// --- No button click ---
+function handleNoClick() {
+    if(finalShown) return;
+    noClicks++;
+    question.innerText = messages[Math.min(noClicks, messages.length - 1)];
+
+    // Faster float
+    floatSpeed = Math.max(300, floatSpeed - 100); 
+    startFloating();
+
+    // Last click: bounce toward Yes then shrink
+    if(noClicks >= messages.length - 1){
+        const yesRect = yesBtn.getBoundingClientRect();
+        const noRect = noBtn.getBoundingClientRect();
+        const moveX = yesRect.left - noRect.left;
+        const moveY = yesRect.top - noRect.top;
+        noBtn.style.transition = "all 0.6s ease";
+        noBtn.style.transform = `translate(${moveX*0.5}px, ${moveY*0.5}px) scale(0.3)`;
+        noBtn.style.opacity = "0.6";
+    }
+}
+
+noBtn.addEventListener("click", handleNoClick);
+noBtn.addEventListener("mouseover", wiggleBtn);
+noBtn.addEventListener("touchstart", wiggleBtn);
+
+// --- Yes button ---
+yesBtn.addEventListener("click", () => {
+    finalShown = true;
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none"; 
+    question.style.display = "none";
+
+    let count = 3;
+    const countdown = document.createElement("div");
+    countdown.style.fontSize = "5vw";
+    countdown.style.marginTop = "20px";
+    countdown.innerText = "Loading love... " + count;
+    document.body.appendChild(countdown);
+
+    const interval = setInterval(() => {
+        count--;
+        if(count >= 0){
+            countdown.innerText = "Loading love... " + count;
+        } else {
+            clearInterval(interval);
+            countdown.remove();
+            showLoveCard();
+        }
+    }, 1000);
+});
+
+// --- Final card ---
+function showLoveCard(){
+    finalCard.style.display = "block";
+    setTimeout(() => finalCard.classList.add("show"), 50);
+
+    const text = `
+Kavya…
+
+From the moment you came into my life, everything felt magical.
+Your smile lights up my world, and I promise to always make you feel as special as you make me feel.
+
+So… from now on, let’s write our story together.
+Forever yours, Deva 💌
+    `;
+    let i = 0;
+    function typing(){
+        if(i < text.length){
+            finalText.innerHTML += text[i] === "\n" ? "<br>" : text[i];
+            i++;
+            setTimeout(typing, 35);
+        }
+    }
+    typing();
+    createHearts();
+}
+
+// --- Floating hearts (lighter for mobile) ---
+function createHearts(){
+    for(let i=0;i<60;i++){
+        let heart = document.createElement("div");
+        heart.className = "heart";
+        heart.innerHTML = "💖";
+        heart.style.left = Math.random()*window.innerWidth + "px";
+        heart.style.fontSize = (Math.random()*6 + 3) + "vw";
+        heart.style.animationDuration = (Math.random()*3 + 2) + "s";
+        document.body.appendChild(heart);
+    }
+}
+
+// --- Touch sparkle trail ---
+document.addEventListener("touchmove", (e)=>{
+    for (let touch of e.touches){
+        let sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.left = touch.pageX + "px";
+        sparkle.style.top = touch.pageY + "px";
+        document.body.appendChild(sparkle);
+        setTimeout(()=>sparkle.remove(), 800);
+    }
+});
+</script>
+
+</body>
+</html>
